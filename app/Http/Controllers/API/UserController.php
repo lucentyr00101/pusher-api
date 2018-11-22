@@ -76,12 +76,13 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, \Pusher\Laravel\PusherManager $pusher)
     {
         $user = User::find($id);
         $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
+        $pusher->trigger("users-update", 'user', $user);
         return response()->json($user);
     }
 
@@ -91,8 +92,9 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, \Pusher\Laravel\PusherManager $pusher)
     {
         User::find($id)->delete();
+        $pusher->trigger("users-update", 'user', null);
     }
 }
